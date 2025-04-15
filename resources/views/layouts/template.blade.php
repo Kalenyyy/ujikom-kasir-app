@@ -14,13 +14,13 @@
 </head>
 
 <body class="body bg-white">
-    
+    @yield('modal')
     <div class="fixed w-full z-30 flex bg-white p-2 items-center justify-center h-16 px-10">
         <div class="flex-shrink-0">
             <img src="{{ asset('image/logo.png') }}" alt="" class="h-8 ml-20">
         </div>
         <div class="ml-3 text-dark font-bold transform ease-in-out duration-500 flex items-center">
-            Cartelytics
+            WarungDoMie
         </div>
         <!-- SPACER -->
         <div class="grow h-full flex items-center justify-center"></div>
@@ -34,7 +34,7 @@
                         type="button">
                         <span class="sr-only">Open user menu</span>
                         <i class="fa-solid fa-user text-lg me-2" style="color: #000000;"></i>
-                        Angger Kalehandya Sutarto
+                        {{ Auth::user()->name }}
                         <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,7 +54,7 @@
                             </li>
                         </ul>
                         <div class="py-2">
-                            <a href=""
+                            <a href="{{ route('logout') }}"
                                 class="block px-4 py-2 text-sm text-gray-700  hover:bg-[#3F4151]  hover:text-white">Sign
                                 out</a>
                         </div>
@@ -85,7 +85,7 @@
             <div
                 class ="flex items-center space-x-3 group   via-white-500 to-white-500  pl-10 pr-2 py-1 rounded-full text-white  ">
                 <div class="transform ease-in-out duration-300 mr-12">
-                    Cartelytics
+                    WarungDoMie
                 </div>
             </div>
         </div>
@@ -99,37 +99,40 @@
         </div>
         <!-- MAX SIDEBAR-->
         <div class="max hidden text-white mt-20 flex-col space-y-2 w-full h-[calc(100vh)]">
-            <a href="">
+            <a href="{{ route('dashboard') }}">
                 <div
                     class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
                     <i class="fa-solid fa-house-chimney" style="color: #ffffff;"></i>
                     <span>Home</span>
                 </div>
             </a>
-            
-                <a href="">
-                    <div
-                        class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
-                        <i class="fa-solid fa-warehouse" style="color: #ffffff;"></i>
-                        <span>Stock Products</span>
-                    </div>
-                </a>
-                <a href="">
-                    <div
-                        class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
-                        <i class="fa-solid fa-cart-plus" style="color: #ffffff;"></i>
-                        <span>Data Pembelian</span>
-                    </div>
-                </a>
-                <a href="">
+
+            <a href="{{ route('products.index') }}">
+                <div
+                    class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
+                    <i class="fa-solid fa-warehouse" style="color: #ffffff;"></i>
+                    <span>Stock Products</span>
+                </div>
+            </a>
+            <a href="{{ route('orders.index') }}">
+                <div
+                    class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
+                    <i class="fa-solid fa-cart-plus" style="color: #ffffff;"></i>
+                    <span>Data Pembelian</span>
+                </div>
+            </a>
+            @if (Auth::user()->role == 'Admin')
+                <a href="{{ route('users.index') }}">
                     <div
                         class="hover:ml-4 w-full text-white bg-[#3F4151] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center gap-x-3">
                         <i class="fa-solid fa-users" style="color: #ffffff;"></i>
                         <span>User</span>
                     </div>
                 </a>
+            @endif
 
-                
+
+
         </div>
 
         <!-- MINI SIDEBAR-->
@@ -152,13 +155,15 @@
                     <i class="fa-solid fa-cart-plus" style="color: #ffffff;"></i>
                 </div>
             </a>
-            <a href="">
-                <div
-                    class="hover:ml-4 justify-end pr-5 text-white hover:text-white-500 hover:text-blue-500 w-full bg-[#3F4151] p-3 rounded-full transform ease-in-out duration-300 flex">
-                    <i class="fa-solid fa-users" style="color: #ffffff;"></i>
-                </div>
-            </a>
-            
+            @if (Auth::user()->role == 'Admin')
+                <a href="">
+                    <div
+                        class="hover:ml-4 justify-end pr-5 text-white hover:text-white-500 hover:text-blue-500 w-full bg-[#3F4151] p-3 rounded-full transform ease-in-out duration-300 flex">
+                        <i class="fa-solid fa-users" style="color: #ffffff;"></i>
+                    </div>
+                </a>
+            @endif
+
         </div>
     </aside>
     <!-- CONTENT -->
@@ -190,14 +195,14 @@
                     </div>
                 </li> --}}
 
-                
+                @yield('top_content')
             </ol>
         </nav>
 
         <div class ="flex flex-wrap my-5">
             <div class ="w-full p-2">
                 {{-- codingan disini --}}
-                
+                @yield('content')
             </div>
         </div>
     </div>
@@ -244,7 +249,7 @@
 
         function openNav() {
             if (sidebar.classList.contains('-translate-x-48')) {
-                // max sidebar 
+                // max sidebar
                 sidebar.classList.remove("-translate-x-48")
                 sidebar.classList.add("translate-x-none")
                 maxSidebar.classList.remove("hidden")
