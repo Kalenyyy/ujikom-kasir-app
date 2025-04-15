@@ -20,7 +20,7 @@
                                     Total User
                                 </div>
                                 <div class="">
-                                    {{ $user_count }}
+                                    {{ $users_count }}
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                                     Laporan Terjual Hari Ini
                                 </div>
                                 <div class="">
-                                    0129338338
+                                    {{ $orders_today }}
                                 </div>
                             </div>
                         </div>
@@ -98,10 +98,10 @@
                     Total Penjualan Hari Ini
                 </h1>
                 <div class="text-green-500 text-5xl md:text-6xl font-extrabold mb-2">
-                    Rp 100.000
+                    Rp {{ number_format($total_penjualan_hari_ini, 0, ',', '.') }}
                 </div>
                 <p class="text-gray-500 text-lg">
-                    20 Maret 2025
+                    Total penjualan hari ini dari semua produk yang terjual di WarungDoMie.
                 </p>
 
                 <div class="mt-6 flex justify-center">
@@ -121,14 +121,12 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Data Statis
-        const barLabels = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-        const barData = [120, 150, 100, 180, 130];
+        // Ambil data dari Laravel ke JavaScript
+        const barLabels = @json($dates);
+        const barData = @json($salesPerDay);
 
-        const productLabels = ["Es Teh Leci", "Es Teh Lemon", "Es Kopi", "Americano", "Latte"];
-        const productQuantities = [50, 30, 40, 20, 25];
 
-        // Bar Chart
+        // Buat Bar Chart
         const barCtx = document.getElementById("BarChart").getContext("2d");
         if (barCtx) {
             new Chart(barCtx, {
@@ -139,18 +137,12 @@
                         label: "Total Penjualan Per Hari",
                         data: barData,
                         backgroundColor: [
-                            "rgba(75, 192, 192, 0.5)",
-                            "rgba(54, 162, 235, 0.5)",
-                            "rgba(255, 206, 86, 0.5)",
-                            "rgba(231, 76, 60, 0.5)",
-                            "rgba(153, 102, 255, 0.5)"
+                            "rgba(75, 192, 192, 0.5)", "rgba(54, 162, 235, 0.5)",
+                            "rgba(255, 206, 86, 0.5)", "rgba(231, 76, 60, 0.5)"
                         ],
                         borderColor: [
-                            "rgb(75, 192, 192)",
-                            "rgb(54, 162, 235)",
-                            "rgb(255, 206, 86)",
-                            "rgb(231, 76, 60)",
-                            "rgb(153, 102, 255)"
+                            "rgb(75, 192, 192)", "rgb(54, 162, 235)",
+                            "rgb(255, 206, 86)", "rgb(231, 76, 60)"
                         ],
                         borderWidth: 1
                     }]
@@ -165,30 +157,28 @@
                     }
                 }
             });
+        } else {
+            console.error("Canvas BarChart tidak ditemukan!");
         }
 
-        // Pie Chart
+        // Buat Pie Chart
         const pieCtx = document.getElementById("PieChart").getContext("2d");
         if (pieCtx) {
             new Chart(pieCtx, {
                 type: "pie",
                 data: {
-                    labels: productLabels,
+                    labels: @json($productLabels),
                     datasets: [{
-                        label: "Penjualan Produk",
-                        data: productQuantities,
+                        label: 'Penjualan Produk',
+                        data: @json($productQuantities),
                         backgroundColor: [
-                            "rgba(75, 192, 192, 0.5)",
-                            "rgba(255, 159, 64, 0.5)",
-                            "rgba(153, 102, 255, 0.5)",
-                            "rgba(255, 99, 132, 0.5)",
+                            "rgba(75, 192, 192, 0.5)", "rgba(255, 159, 64, 0.5)",
+                            "rgba(153, 102, 255, 0.5)", "rgba(255, 99, 132, 0.5)",
                             "rgba(54, 162, 235, 0.5)"
                         ],
                         borderColor: [
-                            "rgb(75, 192, 192)",
-                            "rgb(255, 159, 64)",
-                            "rgb(153, 102, 255)",
-                            "rgb(255, 99, 132)",
+                            "rgb(75, 192, 192)", "rgb(255, 159, 64)",
+                            "rgb(153, 102, 255)", "rgb(255, 99, 132)",
                             "rgb(54, 162, 235)"
                         ],
                         borderWidth: 1
@@ -199,6 +189,8 @@
                     maintainAspectRatio: false,
                 }
             });
+        } else {
+            console.error("Canvas PieChart tidak ditemukan!");
         }
     });
 </script>

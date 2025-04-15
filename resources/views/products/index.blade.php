@@ -112,18 +112,30 @@
         <div class="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between pb-4">
             <div class="relative flex items-center space-x-2">
                 <input type="text" id="table-search"
-                    class="block p-2 ps-10 text-sm text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
+                    class="block p-2 ps-10 text-sm hidden text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
                     placeholder="Search for products">
             </div>
-            <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal"
-                class="flex items-center gap-2 text-white bg-[#3F4151] hover:bg-gray-700 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
-                </svg>
-                Tambah Product
-            </button>
+            @if (Auth::user()->role == 'Admin')
+                <a href="{{ route('products.export-products') }}"
+                    class="flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 focus:ring-green-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
+                    </svg>
+                    Export Excel
+                </a>
+                <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal"
+                    class="flex items-center gap-2 text-white bg-[#3F4151] hover:bg-gray-700 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
+                    </svg>
+                    Tambah Product
+                </button>
+            @endif
+
         </div>
 
         <table class="w-full text-sm text-left text-[#3F4151] border border-gray-200 rounded-lg overflow-hidden">
@@ -134,7 +146,10 @@
                     <th scope="col" class="px-6 py-3">Nama Product</th>
                     <th scope="col" class="px-6 py-3">Harga</th>
                     <th scope="col" class="px-6 py-3">Stok</th>
-                    <th scope="col" class="px-6 py-3">Action</th>
+                    @if (Auth::user()->role == 'Admin')
+                        <th scope="col" class="px-6 py-3">Action</th>
+                    @else
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -148,22 +163,66 @@
                         <td class="px-6 py-4">{{ $product->name }}</td>
                         <td class="px-6 py-4">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4">{{ $product->stock }}</td>
-                        <td class="px-6 py-4">
-                            <a href="{{ route('products.edit', $product->id) }}"
-                                class="font-medium text-[#3F4151] hover:underline ml-2">Edit
-                            </a> |
-                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;"
-                                onsubmit="return confirm('Yakin ingin menghapus product ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="font-medium text-[#3F4151] hover:underline">Delete</button>
-                            </form>
+                        @if (Auth::user()->role == 'Admin')
+                            <td class="px-6 py-4">
+                                <a href="{{ route('products.edit', $product->id) }}"
+                                    class="font-medium text-[#3F4151] hover:underline ml-2">Edit
+                                </a> |
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Yakin ingin menghapus product ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="font-medium text-[#3F4151] hover:underline">Delete</button>
+                                </form>
 
-                        </td>
+                            </td>
+                        @endif
+
                     </tr>
                 @endforeach
             </tbody>
         </table>
+        <div class="mt-4 flex justify-between items-center">
+            <p class="text-sm text-gray-600">
+                Menampilkan {{ $products->firstItem() }} - {{ $products->lastItem() }} dari {{ $products->total() }} data
+            </p>
+            <div class="flex space-x-2">
+                @if ($products->onFirstPage())
+                    <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
+                        ← Sebelumnya
+                    </span>
+                @else
+                    <a href="{{ $products->previousPageUrl() }}"
+                        class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                        ← Sebelumnya
+                    </a>
+                @endif
+
+                @foreach ($products->getUrlRange(max($products->currentPage() - 2, 1), min($products->currentPage() + 2, $products->lastPage())) as $page => $url)
+                    @if ($page == $products->currentPage())
+                        <span class="px-3 py-2 text-white bg-blue-500 rounded-md">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}"
+                            class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                            {{ $page }}
+                        </a>
+                    @endif
+                @endforeach
+
+                @if ($products->hasMorePages())
+                    <a href="{{ $products->nextPageUrl() }}"
+                        class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                        Selanjutnya →
+                    </a>
+                @else
+                    <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
+                        Selanjutnya →
+                    </span>
+                @endif
+            </div>
+        </div>
 
     </div>
 

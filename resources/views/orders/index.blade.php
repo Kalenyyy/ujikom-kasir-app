@@ -96,11 +96,11 @@
         <div class="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between pb-4 space-y-2 sm:space-y-0">
             <div class="relative flex items-center space-x-2">
                 <input type="text" id="table-search"
-                    class="block p-2 ps-10 text-sm text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
+                    class="block p-2 ps-10 hidden text-sm text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
                     placeholder="Search for users">
             </div>
             <div class="flex space-x-2">
-                <a href=""
+                <a href="{{ route('orders.export-orders') }}"
                     class="flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 focus:ring-green-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
@@ -110,15 +110,17 @@
                     Export Excel
                 </a>
 
-                <button type="button" data-modal-target="extralarge-modal" data-modal-toggle="extralarge-modal"
-                    class="flex items-center gap-2 text-white bg-[#3F4151] hover:bg-gray-700 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
-                    </svg>
-                    Tambah Penjualan
-                </button>
+                @if (Auth::user()->role == 'Petugas')
+                    <button type="button" data-modal-target="extralarge-modal" data-modal-toggle="extralarge-modal"
+                        class="flex items-center gap-2 text-white bg-[#3F4151] hover:bg-gray-700 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
+                        </svg>
+                        Tambah Penjualan
+                    </button>
+                @endif
 
             </div>
         </div>
@@ -151,7 +153,7 @@
                         <td class="px-6 py-4">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
                         <td class="px-6 py-4">{{ $order->user->name }}</td>
                         <td class="px-6 py-4 flex space-x-2">
-                            <a href="{{ route('orders.detail-order', $order->id) }}">
+                            <a href="{{ route('orders.page-detail-order', $order->id) }}">
                                 <button data-modal-target="sales-detail-modal" data-modal-toggle="sales-detail-modal"
                                     class="sales-detail text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                                     type="button">
@@ -159,7 +161,7 @@
                                 </button>
                             </a>
 
-                            <a href=""
+                            <a href="{{ route('orders.download-detail-order', $order->id) }}"
                                 class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-900">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24"
                                     fill="currentColor">
@@ -176,16 +178,41 @@
 
         <div class="mt-4 flex justify-between items-center">
             <p class="text-sm text-gray-600">
-                Menampilkan 1 - 2 dari 2 data
+                Menampilkan {{ $orders->firstItem() }} - {{ $orders->lastItem() }} dari {{ $orders->total() }} data
             </p>
             <div class="flex space-x-2">
-                <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
-                    ← Sebelumnya
-                </span>
-                <span class="px-3 py-2 text-white bg-blue-500 rounded-md">1</span>
-                <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
-                    Selanjutnya →
-                </span>
+                @if ($orders->onFirstPage())
+                    <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
+                        ← Sebelumnya
+                    </span>
+                @else
+                    <a href="{{ $orders->previousPageUrl() }}"
+                        class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                        ← Sebelumnya
+                    </a>
+                @endif
+
+                @foreach ($orders->getUrlRange(max($orders->currentPage() - 2, 1), min($orders->currentPage() + 2, $orders->lastPage())) as $page => $url)
+                    @if ($page == $orders->currentPage())
+                        <span class="px-3 py-2 text-white bg-blue-500 rounded-md">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}"
+                            class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                            {{ $page }}
+                        </a>
+                    @endif
+                @endforeach
+
+                @if ($orders->hasMorePages())
+                    <a href="{{ $orders->nextPageUrl() }}"
+                        class="px-3 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                        Selanjutnya →
+                    </a>
+                @else
+                    <span class="px-3 py-2 text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
+                        Selanjutnya →
+                    </span>
+                @endif
             </div>
         </div>
 

@@ -84,7 +84,7 @@
 
 
         <div class="mt-6 flex justify-end gap-4">
-            <a href="">
+            <a href="{{ route('orders.download-detail-order', $order->id) }}">
                 <button
                     class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition duration-200">Unduh</button>
             </a>

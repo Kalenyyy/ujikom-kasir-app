@@ -59,12 +59,20 @@
 
 <body>
     <div class="invoice-header">
-        <h2>Ini Warung</h2>
+        <h2>WarungDoMie</h2>
         <hr>
-        <p>Member Status: Member</p>
-        <p>No. HP: 08123456789</p>
-        <p>Bergabung Sejak: 01 Januari 2024</p>
-        <p>Poin Member: 120 Point</p>
+        @if (!is_null($order->members_id))
+            {{-- Perbaikan di sini --}}
+            <p>Member Status: Member</p>
+            <p>No. HP: {{ $order->member->no_telp }}</p>
+            <p>Bergabung Sejak: {{ Carbon\Carbon::parse($order->member->created_at)->format('d F Y') }}</p>
+            <p>Poin Member: {{ number_format($order->member->point, 0, ',', '.') }} Point</p>
+        @else
+            <p>Member Status: Bukan Member</p>
+            <p>No. HP: -</p>
+            <p>Bergabung Sejak: -</p>
+            <p>Poin Member: -</p>
+        @endif
     </div>
 
     <table>
@@ -77,34 +85,31 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Teh Leci</td>
-                <td>2</td>
-                <td>Rp. 5.000</td>
-                <td>Rp. 10.000</td>
-            </tr>
-            <tr>
-                <td>Teh Lemon</td>
-                <td>1</td>
-                <td>Rp. 6.000</td>
-                <td>Rp. 6.000</td>
-            </tr>
+            @foreach ($products as $product)
+                <tr>
+                    <td>{{ $product['name'] }}</td>
+                    <td>{{ $product['quantity'] }}</td>
+                    <td>Rp. {{ number_format($product['price'], 0, ',', '.') }}</td>
+                    <td>Rp. {{ number_format($product['price'] * $product['quantity'], 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 
     <div class="summary">
-        <p>Total Harga: Rp. 16.000</p>
-        <p>Poin Digunakan: 20 Point</p>
-        <p>Harga Setelah Poin: Rp. 14.000</p>
-        <p>Uang Pembeli: Rp. 20.000</p>
-        <p>Total Kembalian: Rp. 6.000</p>
+        <p>Total Harga: Rp. {{ number_format($order->total_harga, 0, ',', '.') }}</p>
+        @if (!is_null($order->members_id))
+            <p>Poin Digunakan: {{ number_format($order->member_point_used, 0, ',', '.') }} Point</p>
+            <p>Harga Setelah Poin: Rp. {{ number_format($order->total_harga_after_point, 0, ',', '.') }}</p>
+        @endif
+        <p>Uang Pembeli: Rp. {{ number_format($order->customer_pay, 0, ',', '.') }}</p>
+        <p>Total Kembalian: Rp. {{ number_format($order->customer_return, 0, ',', '.') }}</p>
     </div>
 
     <div class="footer">
-        <p>2025-04-14 14:30:00 | Petugas: Budi</p>
+        <p>{{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }} | Petugas: {{ $order->user->name }}</p>
         <p>Terima kasih atas pembelian Anda!</p>
     </div>
-
 </body>
 
 </html>

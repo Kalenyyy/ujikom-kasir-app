@@ -122,9 +122,18 @@
         <div class="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between pb-4">
             <div class="relative flex items-center space-x-2">
                 <input type="text" id="table-search"
-                    class="block p-2 ps-10 text-sm text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
+                    class="block p-2 ps-10 hidden text-sm text-[#3F4151] border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-[#3F4151] focus:border-[#3F4151]"
                     placeholder="Search for users">
             </div>
+            <a href="{{ route('users.export-users') }}"
+                    class="flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 focus:ring-green-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.5 1.5M4 9a8 8 0 0116 0v4a8 8 0 01-16 0V9z"></path>
+                    </svg>
+                    Export Excel
+                </a>
             <button type="button" data-modal-target="add-user-modal" data-modal-toggle="add-user-modal"
                 class="flex items-center gap-2 text-white bg-[#3F4151] hover:bg-gray-700 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 shadow transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"

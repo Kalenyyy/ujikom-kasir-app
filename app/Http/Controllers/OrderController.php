@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrdersExport;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -271,5 +273,25 @@ class OrderController extends Controller
         }
 
         return redirect()->route('orders.detail-order', $order->id);
+    }
+
+    public function generatePDF($id)
+    {
+        // Ambil data order berdasarkan ID
+        $order = Order::with('user', 'member')->findOrFail($id);
+
+        // Decode JSON produk dari database
+        $products = json_decode($order->products, true);
+
+        // Load view untuk PDF dan kirim data
+        $pdf = app('dompdf.wrapper')->loadView('orders.order-detail-PDF', compact('order', 'products'));
+
+        // Unduh atau tampilkan PDF di browser
+        // return $pdf->stream('order.pdf'); // Menampilkan di browser
+        return $pdf->download('order.pdf'); // Jika ingin langsung diunduh
+    }
+
+    public function exportOrders() {
+        return Excel::download(new OrdersExport, 'orders.xlsx');
     }
 }

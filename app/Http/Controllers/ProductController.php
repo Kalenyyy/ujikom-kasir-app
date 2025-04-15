@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
     public function index()
     {
 
-        $products = Product::all();
+        $products = Product::paginate(8);
         return view('products.index', compact('products'));
     }
 
@@ -93,5 +95,9 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product berhasil dihapus');
+    }
+
+    public function exportProducts() {
+        return Excel::download(new ProductsExport, 'products.xlsx');
     }
 }

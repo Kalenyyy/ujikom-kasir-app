@@ -36,6 +36,7 @@ Route::middleware('isLogin')->group(function () {
             Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
             Route::patch('/update/{id}', [UserController::class, 'update'])->name('update');
             Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy');
+            Route::get('/export-users-excel', [UserController::class, 'exportUsers'])->name('export-users');
         });
 
         Route::prefix('products')->name('products.')->group(function () {
@@ -44,6 +45,7 @@ Route::middleware('isLogin')->group(function () {
             Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('edit');
             Route::patch('/update/{id}', [ProductController::class, 'update'])->name('update');
             Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('destroy');
+            Route::get('/export-products-excel', [ProductController::class, 'exportProducts'])->name('export-products');
         });
     });
 
@@ -52,9 +54,13 @@ Route::middleware('isLogin')->group(function () {
         Route::post('/checkout', [OrderController::class, 'showCheckout'])->name('process');
         Route::post('/checkout/store', [OrderController::class, 'checkout'])->name('store');
         Route::get('/checkout/detail-order/{id}', [OrderController::class, 'showDetailOrder'])->name('detail-order');
-        Route::get('detail-order/{id}', [OrderController::class, 'detailPrintOrder'])->name('detail-order');
+        Route::get('/detail-order/{id}', [OrderController::class, 'detailPrintOrder'])->name('page-detail-order');
         Route::get('/checkout/member', [OrderController::class, 'showCheckoutMember'])->name('show-checkout-member');
         Route::post('/checkout/member/store', [OrderController::class, 'storeOrderMember'])->name('store-order-member');
+        Route::get('/checkout/detail-order-pdf/{id}', [OrderController::class, 'generatePDF'])->name('download-detail-order');
+        Route::get('/export-orders-excel', [OrderController::class, 'exportOrders'])->name('export-orders');
+
+
 
 
 

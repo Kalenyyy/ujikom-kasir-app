@@ -12,12 +12,13 @@
                 <div class="flex justify-between text-sm">
                     @if ($order->members_id != null)
                         <div>
-                            <p><span class="font-semibold">Member Status:</span> Bukan Member</p>
-                            <p><span class="font-semibold">No. HP:</span> -</p>
-                            <p><span class="font-semibold">Poin Member:</span> 0</p>
+                            <p><span class="font-semibold">Member Status:</span> {{ $order->member->name_member }}</p>
+                            <p><span class="font-semibold">No. HP:</span> {{ $order->member->no_telp }}</p>
+                            <p><span class="font-semibold">Poin Member:</span> {{ $order->member->point }}</p>
                         </div>
                         <div>
-                            <p><span class="font-semibold">Bergabung Sejak:</span> -</p>
+                            <p><span class="font-semibold">Bergabung Sejak:</span>
+                                {{ \Carbon\Carbon::parse($order->member->created_at)->format('d M Y') }}</p>
                         </div>
                     @elseif($order->members_id == null)
                         <div>
@@ -60,19 +61,25 @@
                     @if ($order->members_id != null)
                         <div class="flex justify-between font-semibold">
                             <span>Total Belanja</span>
-                            <span>Rp. 155.000</span>
+                            <span>Rp. {{ number_format($order->total_harga, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span>Point Digunakan</span>
-                            <span>0</span>
+                            <span>
+                                @if ($order->member_point_used > 0)
+                                    {{ $order->member_point_used }}
+                                @else
+                                    Tidak ada poin yang digunakan
+                                @endif
+                            </span>
                         </div>
                         <div class="flex justify-between">
                             <span>Bayaran Pembeli</span>
-                            <span>Rp. 200.000</span>
+                            <span>Rp. {{ number_format($order->customer_pay, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between font-semibold">
                             <span>Kembalian</span>
-                            <span>Rp. 45.000</span>
+                            <span>Rp. {{ number_format($order->total_harga_after_point, 0, ',', '.') }}</span>
                         </div>
                     @elseif($order->members_id == null)
                         <div class="flex justify-between font-semibold">
